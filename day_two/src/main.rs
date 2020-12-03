@@ -17,7 +17,7 @@ fn part_one() -> Result<i32> {
     for line in input.lines() {
         // string is of format: 4-5 l: rllllj
         // <range> <letter>: <password>
-        let line_parts: Vec<&str> = line.split(" ").collect();
+        let line_parts: Vec<&str> = line.split_whitespace().collect();
 
         let range: Vec<&str> = line_parts[0].split("-").collect();
         let range_start: usize = range[0].parse()?;
@@ -26,7 +26,6 @@ fn part_one() -> Result<i32> {
         let password = line_parts[2];
 
         let occurances = password.matches(&letter).count();
-
         if occurances >= range_start && occurances <= range_end {
             count = count + 1;
         }
@@ -45,13 +44,11 @@ fn part_two() -> Result<i32> {
         let range: Vec<&str> = line_parts[0].split("-").collect();
         let first_index: usize = range[0].parse()?;
         let second_index: usize = range[1].parse()?;
-        let letter = line_parts[1].replace(":", "");
-        let password = line_parts[2];
+        let letter: char = line_parts[1].chars().nth(0).unwrap();
+        let password: Vec<char> = line_parts[2].chars().collect();
 
-        let first_letter_to_check: &str = &password[(first_index - 1)..first_index];
-        let second_letter_to_check: &str = &password[(second_index - 1)..second_index];
-        let first_ok = first_letter_to_check.matches(&letter).count() == 1;
-        let second_ok = second_letter_to_check.matches(&letter).count() == 1;
+        let first_ok = password[first_index - 1] == letter;
+        let second_ok = password[second_index - 1] == letter;
 
         if (first_ok && !second_ok) || (!first_ok && second_ok) {
             count = count + 1;
