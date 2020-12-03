@@ -23,12 +23,15 @@ Part 2
 - You can return using `Result<i32>` the `Result<()>` I was using before was for undefined
 - You cannot chain methods together so easily when you need to use an ampersand to use them first
 
-# Refactoring after looking at others solutions
+Refactoring after looking at others solutions
 
 - You can split on whitespace using `split_whitespace()`
 - Rust has destructuing like `let (range_min, range_max) = (ranges[0], ranges[1]);`
+- You can index into string by making a char vector first `"abc".chars().collect()`
+- Raise errors with `panic!("impossible")`
 
 ## Others
 
 - https://github.com/XorJoep/AoC_2020
 - https://github.com/vildapavlicek/AoC2020/
+- https://github.com/pedantic79/advent-of-code-2020
