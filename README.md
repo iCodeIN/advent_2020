@@ -35,3 +35,5 @@ Refactoring after looking at others solutions
 - https://github.com/XorJoep/AoC_2020
 - https://github.com/vildapavlicek/AoC2020/
 - https://github.com/pedantic79/advent-of-code-2020
+- https://github.com/kvrhdn/Advent-of-Code
+- https://github.com/CapnRat/adventofcode2020
