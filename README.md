@@ -30,7 +30,7 @@ Refactoring after looking at others solutions
 - You can index into string by making a char vector first `"abc".chars().collect()`
 - Raise errors with `panic!("impossible")`
 
-Reading the Rust book Chapter 1-2
+# Reading the Rust book Chapter 1-2
 
 - Functions with an exclaimation point! are calling Macros
 - `rustc` is the compiler. You don't need Rust installed to run Rust apps
@@ -62,6 +62,10 @@ Reading the Rust book Chapter 3
 - You specify size with: `let a: [i32; 5] = [1, 2, 3, 4, 5];`
 - You can get a repeate value array with: `let a = [3; 5]`
 - if you try to index into an array out of bounds - the compiler will catch it (cool!)
+
+# Exercise 3
+
+-
 
 ## Others
 
