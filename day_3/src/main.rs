@@ -4,6 +4,7 @@ use std::fs;
 type Result<T> = ::std::result::Result<T, Box<dyn std::error::Error>>;
 const HEIGHT_OF_ROUTE: i32 = 323;
 const WIDTH_OF_ROUTE: i32 = 31;
+const TREE_INDICATOR: char = '#';
 
 fn main() -> Result<()> {
     println!("Part one: {}", part_one()?);
@@ -49,7 +50,7 @@ fn parse_map() -> Result<HashSet<[i32; 2]>> {
     for line in input.lines() {
         let mut x = 0;
         for terrain in line.chars() {
-            if terrain == '#' {
+            if terrain == TREE_INDICATOR {
                 trees.insert([x, y]);
             }
             x = x + 1;
