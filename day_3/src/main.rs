@@ -3,11 +3,10 @@ use std::fs;
 
 type Result<T> = ::std::result::Result<T, Box<dyn std::error::Error>>;
 const HEIGHT_OF_ROUTE: i32 = 323;
-const WIDTH_OF_ROUTE: i32 = 30;
+const WIDTH_OF_ROUTE: i32 = 31;
 
 fn main() -> Result<()> {
     println!("Part one: {}", part_one()?);
-
     Ok(())
 }
 
@@ -20,13 +19,6 @@ fn part_one() -> Result<i32> {
     while position[1] < HEIGHT_OF_ROUTE {
         position = next_position(position);
         let wrapped_position = adjusted_position(position);
-        println!(
-            "check {}/{}, {} => {}",
-            position[0],
-            wrapped_position[0],
-            position[1],
-            trees.contains(&wrapped_position)
-        );
         if trees.contains(&wrapped_position) {
             trees_encountered = trees_encountered + 1
         }
@@ -59,10 +51,7 @@ fn next_position(current: [i32; 2]) -> [i32; 2] {
 }
 
 fn adjusted_position(current: [i32; 2]) -> [i32; 2] {
-    if current[0] != 0 && current[0] % WIDTH_OF_ROUTE == 0 {
-        return [WIDTH_OF_ROUTE, current[1]];
-    }
-    [current[0] % WIDTH_OF_ROUTE, current[1]]
+    [current[0] % (WIDTH_OF_ROUTE), current[1]]
 }
 
 #[test]
@@ -79,9 +68,16 @@ fn can_plot_route() {
 }
 
 #[test]
-fn can_calculate_adjusted_position() {
+fn can_calculate_adjusted_position_leaves_y() {
     assert_eq!([0, 0], adjusted_position([0, 0]));
-    assert_eq!([1, 1000], adjusted_position([31, 1000]));
-    assert_eq!([30, 10], adjusted_position([30, 10]));
-    assert_eq!([30, 10], adjusted_position([60, 10]));
+    assert_eq!([0, 10], adjusted_position([0, 10]));
+}
+
+#[test]
+fn can_calculate_adjusted_position_fixes_x() {
+    assert_eq!([0, 0], adjusted_position([0, 0]));
+    assert_eq!([30, 0], adjusted_position([30, 0]));
+    assert_eq!([0, 0], adjusted_position([31, 0]));
+    assert_eq!([1, 0], adjusted_position([32, 0]));
+    assert_eq!([29, 0], adjusted_position([60, 0]));
 }
