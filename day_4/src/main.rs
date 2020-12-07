@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::collections::HashSet;
 use std::fs;
 
 fn main() {
@@ -14,7 +15,7 @@ fn part_one() -> usize {
         .filter_map(|x| x)
         .collect();
 
-    return passports.len();
+    passports.len()
 }
 
 fn file_to_passports(input: &str) -> Vec<String> {
@@ -22,7 +23,7 @@ fn file_to_passports(input: &str) -> Vec<String> {
 
     let mut current_passport: Vec<&str> = Vec::new();
     for line in input.lines() {
-        if line.len() == 0 {
+        if line.is_empty() {
             passports.push(current_passport.join(" "));
             current_passport = Vec::new();
         } else {
@@ -31,7 +32,7 @@ fn file_to_passports(input: &str) -> Vec<String> {
     }
     passports.push(current_passport.join(" "));
 
-    return passports;
+    passports
 }
 
 #[derive(Debug, PartialEq)]
@@ -48,18 +49,22 @@ struct Passport {
 impl Passport {
     fn new(line: String) -> Option<Passport> {
         let mut passport_bits: HashMap<&str, &str> = HashMap::new();
-        let tokens = line.split(" ");
+        let tokens = line.split(' ');
         for token in tokens {
-            let token: Vec<&str> = token.split(":").collect();
+            let token: Vec<&str> = token.split(':').collect();
             passport_bits.insert(token[0], token[1]);
         }
 
-        let required_fields = vec!["byr"];
-        if !passport_bits.contains_key("byr") {
+        let required_fields: HashSet<&'static str> =
+            vec!["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"]
+                .into_iter()
+                .collect();
+        let available_fields: HashSet<&str> = passport_bits.keys().copied().collect();
+        if required_fields.intersection(&available_fields).count() != 7 {
             return None;
         }
 
-        return Some(Passport {
+        Some(Passport {
             birth_year: match passport_bits.get("byr") {
                 Some(val) => val.parse().expect("not a number"),
                 None => panic!("field missing birth_year"),
@@ -88,7 +93,7 @@ impl Passport {
                 Some(val) => val.to_string(),
                 None => panic!("field missing passport_id"),
             },
-        });
+        })
     }
 }
 

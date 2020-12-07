@@ -67,6 +67,11 @@ Reading the Rust book Chapter 3
 
 -
 
+# Adrian recommends
+
+- https://www.youtube.com/watch?v=rAl-9HwD858&list=PLqbS7AVVErFiWDOAVrPt7aYmnuuOLYvOa&index=1
+- https://github.com/rust-lang/rust-clippy
+
 ## Others
 
 - https://github.com/XorJoep/AoC_2020
