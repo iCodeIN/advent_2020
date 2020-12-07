@@ -1,6 +1,14 @@
+use lazy_static::lazy_static;
 use regex::Regex;
 use std::collections::HashMap;
 use std::fs;
+
+const REQUIRED_FIELDS: [&str; 7] = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"];
+const VALID_EYE_COLOURS: [&str; 7] = ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"];
+lazy_static! {
+    static ref VALID_HAIR_REGEX: Regex = Regex::new(r"^#[a-f0-9]{6}$").unwrap();
+    static ref VALID_PASSPORT_REGEX: Regex = Regex::new(r"^[0-9]{9}$").unwrap();
+}
 
 fn main() {
     println!("Day One: {}", part_one());
@@ -47,11 +55,10 @@ struct Passport {
     passport_id: String,
 }
 
-const REQUIRED_FIELDS: [&str; 7] = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"];
 impl Passport {
     fn new(line: &str) -> Option<Passport> {
         let mut passport_bits: HashMap<&str, &str> = HashMap::new();
-        for token in line.split_ascii_whitespace() {
+        for token in line.split(' ') {
             let token: Vec<&str> = token.split(':').collect();
             passport_bits.insert(token[0], token[1]);
         }
@@ -116,16 +123,15 @@ fn is_valid_height(height: &str) -> bool {
 }
 
 fn is_valid_hair(hair: &str) -> bool {
-    Regex::new(r"^#[a-f0-9]{6}$").unwrap().is_match(hair)
+    VALID_HAIR_REGEX.is_match(hair)
 }
 
-const VALID_EYE_COLOURS: [&str; 7] = ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"];
 fn is_valid_eye_colour(eye: &str) -> bool {
     VALID_EYE_COLOURS.contains(&eye)
 }
 
 fn is_valid_passport_number(passport_number: &str) -> bool {
-    Regex::new(r"^[0-9]{9}$").unwrap().is_match(passport_number)
+    VALID_PASSPORT_REGEX.is_match(passport_number)
 }
 
 #[test]
