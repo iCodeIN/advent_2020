@@ -13,7 +13,7 @@ fn part_one() -> usize {
     let passports: Vec<String> = file_to_passports(&input);
     let passports: Vec<Passport> = passports
         .iter()
-        .map(|p| Passport::new(p.to_string()))
+        .map(|p| Passport::new(p))
         .filter_map(|x| x)
         .collect();
 
@@ -25,7 +25,7 @@ fn part_two() -> usize {
     let passports: Vec<String> = file_to_passports(&input);
     let passports: Vec<Passport> = passports
         .iter()
-        .map(|p| Passport::new(p.to_string()))
+        .map(|p| Passport::new(p))
         .filter_map(|x| x)
         .filter(|p| p.is_valid())
         .collect();
@@ -62,7 +62,7 @@ struct Passport {
 }
 
 impl Passport {
-    fn new(line: String) -> Option<Passport> {
+    fn new(line: &str) -> Option<Passport> {
         let mut passport_bits: HashMap<&str, &str> = HashMap::new();
         let tokens = line.split(' ');
         for token in tokens {
@@ -156,7 +156,7 @@ fn is_valid_hair(hair: &str) -> bool {
     Regex::new(r"^#[a-f0-9]{6}$").unwrap().is_match(hair)
 }
 
-const VALID_EYE_COLOURS: [&'static str; 7] = ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"];
+const VALID_EYE_COLOURS: [&str; 7] = ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"];
 fn is_valid_eye_colour(eye: &str) -> bool {
     VALID_EYE_COLOURS.contains(&eye)
 }
@@ -196,13 +196,13 @@ fn can_make_passport_line_into_passport() {
 
     let input = "ecl:gry pid:860033327 eyr:2020 hcl:#fffffd byr:1937 iyr:2017 cid:147 hgt:183cm";
 
-    assert_eq!(p, Passport::new(input.to_string()).expect(""));
+    assert_eq!(p, Passport::new(input).expect(""));
 }
 
 #[test]
 fn can_reject_invalid_passports() {
     let input = "a:1";
-    assert!(Passport::new(input.to_string()).is_none());
+    assert!(Passport::new(input).is_none());
 }
 
 #[test]
