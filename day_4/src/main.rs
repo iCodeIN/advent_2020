@@ -1,6 +1,5 @@
 use regex::Regex;
 use std::collections::HashMap;
-use std::collections::HashSet;
 use std::fs;
 
 fn main() {
@@ -10,7 +9,7 @@ fn main() {
 
 fn part_one() -> usize {
     let input = fs::read_to_string("src/input.txt").expect("Something went wrong reading the file");
-    let passports: Vec<String> = file_to_passports(&input);
+    let passports: Vec<String> = join_lines_between_blank_lines(&input);
     let passports: Vec<Passport> = passports
         .iter()
         .map(|p| Passport::new(p))
@@ -22,7 +21,7 @@ fn part_one() -> usize {
 
 fn part_two() -> usize {
     let input = fs::read_to_string("src/input.txt").expect("Something went wrong reading the file");
-    let passports: Vec<String> = file_to_passports(&input);
+    let passports: Vec<String> = join_lines_between_blank_lines(&input);
     let passports: Vec<Passport> = passports
         .iter()
         .map(|p| Passport::new(p))
@@ -33,21 +32,8 @@ fn part_two() -> usize {
     passports.len()
 }
 
-fn file_to_passports(input: &str) -> Vec<String> {
-    let mut passports: Vec<String> = Vec::new();
-
-    let mut current_passport: Vec<&str> = Vec::new();
-    for line in input.lines() {
-        if line.is_empty() {
-            passports.push(current_passport.join(" "));
-            current_passport = Vec::new();
-        } else {
-            current_passport.push(line.trim());
-        }
-    }
-    passports.push(current_passport.join(" "));
-
-    passports
+fn join_lines_between_blank_lines(input: &str) -> Vec<String> {
+    input.split("\n\n").map(|l| l.replace("\n", " ")).collect()
 }
 
 #[derive(Debug, PartialEq)]
@@ -61,54 +47,31 @@ struct Passport {
     passport_id: String,
 }
 
+const REQUIRED_FIELDS: [&str; 7] = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"];
 impl Passport {
     fn new(line: &str) -> Option<Passport> {
         let mut passport_bits: HashMap<&str, &str> = HashMap::new();
-        let tokens = line.split(' ');
-        for token in tokens {
+        for token in line.split_ascii_whitespace() {
             let token: Vec<&str> = token.split(':').collect();
             passport_bits.insert(token[0], token[1]);
         }
 
-        let required_fields: HashSet<&'static str> =
-            vec!["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"]
-                .into_iter()
-                .collect();
-        let available_fields: HashSet<&str> = passport_bits.keys().copied().collect();
-        if required_fields.intersection(&available_fields).count() != 7 {
-            return None;
+        if REQUIRED_FIELDS
+            .iter()
+            .all(|field| passport_bits.contains_key(field))
+        {
+            return Some(Passport {
+                birth_year: passport_bits.get("byr")?.parse().expect("not a number"),
+                issue_year: passport_bits.get("iyr")?.parse().expect("not a number"),
+                expiration_year: passport_bits.get("eyr")?.parse().expect("not a number"),
+                height: passport_bits.get("hgt")?.to_string(),
+                hair_colour: passport_bits.get("hcl")?.to_string(),
+                eye_colour: passport_bits.get("ecl")?.to_string(),
+                passport_id: passport_bits.get("pid")?.to_string(),
+            });
         }
 
-        Some(Passport {
-            birth_year: match passport_bits.get("byr") {
-                Some(val) => val.parse().expect("not a number"),
-                None => panic!("field missing birth_year"),
-            },
-            issue_year: match passport_bits.get("iyr") {
-                Some(val) => val.parse().expect("not a number"),
-                None => panic!("field missing issue_year"),
-            },
-            expiration_year: match passport_bits.get("eyr") {
-                Some(val) => val.parse().expect("not a number"),
-                None => panic!("field missing expiration_year"),
-            },
-            height: match passport_bits.get("hgt") {
-                Some(val) => val.to_string(),
-                None => panic!("field missing height"),
-            },
-            hair_colour: match passport_bits.get("hcl") {
-                Some(val) => val.to_string(),
-                None => panic!("field missing hair_colour"),
-            },
-            eye_colour: match passport_bits.get("ecl") {
-                Some(val) => val.to_string(),
-                None => panic!("field missing eye_colour"),
-            },
-            passport_id: match passport_bits.get("pid") {
-                Some(val) => val.to_string(),
-                None => panic!("field missing passport_id"),
-            },
-        })
+        None
     }
 
     fn is_valid(&self) -> bool {
@@ -123,15 +86,15 @@ impl Passport {
 }
 
 fn is_valid_birth_year(year: i32) -> bool {
-    year >= 1920 && year <= 2002
+    (1920..=2002).contains(&year)
 }
 
 fn is_valid_issue_year(year: i32) -> bool {
-    year >= 2010 && year <= 2020
+    (2010..=2020).contains(&year)
 }
 
 fn is_valid_expiration_year(year: i32) -> bool {
-    year >= 2020 && year <= 2030
+    (2020..=2030).contains(&year)
 }
 
 fn is_valid_height(height: &str) -> bool {
@@ -140,14 +103,14 @@ fn is_valid_height(height: &str) -> bool {
             Ok(val) => val,
             Err(_) => 0,
         };
-        return cms >= 150 && cms <= 193;
+        return (150..=193).contains(&cms);
     }
     if height.ends_with("in") && height.len() == 4 {
         let inches: i32 = match height[0..2].parse() {
             Ok(val) => val,
             Err(_) => 0,
         };
-        return inches >= 59 && inches <= 76;
+        return (59..=76).contains(&inches);
     }
     false
 }
@@ -169,7 +132,7 @@ fn is_valid_passport_number(passport_number: &str) -> bool {
 fn can_separate_passports_into_single_lines_of_data() {
     let input =
         fs::read_to_string("src/example.txt").expect("Something went wrong reading the file");
-    let passports = file_to_passports(&input);
+    let passports = join_lines_between_blank_lines(&input);
 
     assert_eq!(4, passports.len());
     assert_eq!(
