@@ -65,7 +65,7 @@ Reading the Rust book Chapter 3
 
 # Exercise 3
 
--
+- Good article on &str vs String: https://hermanradtke.com/2015/05/03/string-vs-str-in-rust-functions.html
 
 # Adrian recommends
 
