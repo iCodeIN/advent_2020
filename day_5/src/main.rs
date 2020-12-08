@@ -3,43 +3,43 @@ use std::fs;
 
 fn main() {
     println!("Part One: {}", part_one());
-    println!("Part Two: {}", part_two());
+    match part_two() {
+        Some(v) => println!("Part Two: {}", v),
+        None => println!("Part Two: No result"),
+    }
 }
 
 fn part_one() -> i32 {
     let input = fs::read_to_string("src/input.txt").expect("Something went wrong reading the file");
 
-    let mut seats: Vec<(i32, i32, i32)> = input.lines().map(|s| place_for_ticket(s)).collect();
+    let mut seats: Vec<(i32, i32, i32)> = input.lines().map(place_for_ticket).collect();
     seats.sort_by(|a, b| b.2.cmp(&a.2));
 
     seats[0].2
 }
 
-fn part_two() -> i32 {
+fn part_two() -> Option<i32> {
     let input = fs::read_to_string("src/input.txt").expect("Something went wrong reading the file");
 
-    let mut seats: Vec<(i32, i32, i32)> = input.lines().map(|s| place_for_ticket(s)).collect();
+    let mut seats: Vec<(i32, i32, i32)> = input.lines().map(place_for_ticket).collect();
     seats.sort_by(|a, b| b.2.cmp(&a.2));
+
+    let mut taken_seats: HashSet<i32> = HashSet::new();
+    for (_, _, seat_id) in &seats {
+        taken_seats.insert(*seat_id);
+    }
 
     let highest_seat_id = seats[0].2;
     let lowest_seat_id: i32 = match seats.last() {
         Some(v) => v.2,
         None => 0,
     };
-    let seat_number_range = lowest_seat_id..=highest_seat_id;
 
-    let mut seen: HashSet<i32> = HashSet::new();
-    for (_, _, seat_id) in seats {
-        seen.insert(seat_id);
-    }
-
-    for seat_id in seat_number_range {
-        if !seen.contains(&seat_id) {
-            return seat_id;
-        }
-    }
-
-    0
+    (lowest_seat_id..=highest_seat_id)
+        .into_iter()
+        .filter(|x| !taken_seats.contains(&x))
+        .take(1)
+        .next()
 }
 
 fn place_for_ticket(input: &str) -> (i32, i32, i32) {
