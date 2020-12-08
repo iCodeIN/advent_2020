@@ -68,6 +68,7 @@ Reading the Rust book Chapter 3
 - Good article on &str vs String: https://hermanradtke.com/2015/05/03/string-vs-str-in-rust-functions.html
 - Rust has inclusive ranges like: `(2020..=2030).contains(&year)`
 - Regex is a Crate and not built in
+- Regex are slow to compile. Use `lazy_static!` to cache them
 
 # Adrian recommends
 
