@@ -3,6 +3,7 @@ use regex::Regex;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::fs;
+#[allow(unused_imports)]
 use std::iter::FromIterator;
 
 lazy_static! {
@@ -15,7 +16,7 @@ fn main() {
 
 fn part_one() -> usize {
     let lines = fs::read_to_string("src/input.txt").expect("Something went wrong reading the file");
-    let bags: Vec<Vec<&str>> = lines.lines().map(|l| find_bags_from_string(l)).collect();
+    let bags = lines.lines().map(find_bags_from_string).collect();
     let bag_parents = discover_bag_parents(bags);
     find_possible_parents_for_given_bag("shiny gold", bag_parents).len()
 }
