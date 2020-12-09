@@ -1,6 +1,5 @@
 #[allow(unused_imports)]
 use indoc::indoc;
-use std::collections::HashMap;
 use std::collections::HashSet;
 use std::fs;
 
@@ -20,10 +19,10 @@ fn part_one() -> usize {
 
 fn part_two() -> usize {
     let input = fs::read_to_string("src/input.txt").expect("Something went wrong reading the file");
-    let group_answers: Vec<String> = join_lines_between_blank_lines(&input);
+    let group_answers: Vec<Vec<&str>> = split_on_blank_lines(&input);
     group_answers
         .into_iter()
-        .map(|group| repeated_letters(&group).len())
+        .map(|group| common_answers(group).len())
         .sum()
 }
 
@@ -32,14 +31,13 @@ fn unique_letters(input: &str) -> usize {
     unique.len()
 }
 
-fn repeated_letters(input: &str) -> Vec<char> {
-    let mut frequency: HashMap<char, u32> = HashMap::new();
-    for letter in input.chars() {
-        *frequency.entry(letter).or_insert(0) += 1;
-    }
-
-    let repeated_only: HashMap<char, u32> = frequency.into_iter().filter(|&(_, v)| v > 1).collect();
-    repeated_only.keys().cloned().collect()
+fn common_answers(input: Vec<&str>) -> Vec<char> {
+    let first = input.first().unwrap_or(&"");
+    let rest: &[&str] = &input[1..];
+    first
+        .chars()
+        .filter(|letter| rest.into_iter().all(|a| a.contains(*letter)))
+        .collect()
 }
 
 fn join_lines_between_blank_lines(input: &str) -> Vec<String> {
@@ -49,17 +47,19 @@ fn join_lines_between_blank_lines(input: &str) -> Vec<String> {
         .collect()
 }
 
+fn split_on_blank_lines(input: &str) -> Vec<Vec<&str>> {
+    input
+        .split("\n\n")
+        .map(|l| l.split("\n").collect())
+        .collect()
+}
+
 #[test]
 fn can_work_out_unique() {
     assert_eq!(3, unique_letters("abc"));
     assert_eq!(3, unique_letters("abac"));
     assert_eq!(1, unique_letters("aaaa"));
     assert_eq!(1, unique_letters("b"));
-}
-
-#[test]
-fn can_work_out_repeated() {
-    assert_eq!(vec!['a'], repeated_letters("aabc"));
 }
 
 #[test]
@@ -83,3 +83,47 @@ fn it_tidies_up_input() {
 
     assert_eq!(lines, vec!["abc", "abc", "abac", "aaaa", "b"]);
 }
+
+#[test]
+fn it_can_find_common_answers() {
+    let empty_array: Vec<char> = vec![];
+    assert_eq!(vec!['a', 'b', 'c'], common_answers(vec!["abc"]));
+    assert_eq!(empty_array, common_answers(vec!["a", "b", "c"]));
+    assert_eq!(vec!['a'], common_answers(vec!["ab", "ac"]));
+    assert_eq!(vec!['a'], common_answers(vec!["a", "a", "a", "a"]));
+    assert_eq!(vec!['b'], common_answers(vec!["b"]));
+}
+
+#[test]
+fn it_tidies_up_input_preserving_groups() {
+    let input = indoc! {"abc
+
+        a
+        b
+        c
+        
+        ab
+        ac
+        
+        a
+        a
+        a
+        a
+        
+        b"};
+    let lines = split_on_blank_lines(&input);
+
+    assert_eq!(
+        lines,
+        vec![
+            vec!["abc"],
+            vec!["a", "b", "c"],
+            vec!["ab", "ac"],
+            vec!["a", "a", "a", "a"],
+            vec!["b"]
+        ]
+    );
+}
+
+// Part One: 6549
+// Part Two: 3466
